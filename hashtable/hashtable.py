@@ -58,41 +58,35 @@ class HashTable:
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
-        """
-        Store the value with the given key.
-        Hash collisions should be handled with Linked List Chaining.
-        Implement this.
-        """
 
         index =  self.hash_index(key)
         new_val = HashTableEntry(key, value)
         cur = self.storage[index]
         if cur is not None:
-            #overwriting value
             self.storage[index] = new_val
             self.storage[index].next = cur
         else:
-            self.storage[index] = HashTableEntry(key, value)
+            self.storage[index] = new_val
         return self.storage[index].value
 
     def delete(self, key):
-        """
-        Remove the value stored with the given key.
 
-        Print a warning if the key is not found.
-
-        Implement this.
-        """
         index = self.hash_index(key)
-        cur = self.storage[index]
         prev = None
-        
-        while cur.next is not None:
+        cur = self.storage[index]
+
+        #if there's nothing in that storage
+
+        if cur.key == key:
+            cur = cur.next
+            return cur
+
+        while cur != None:
             if cur.key == key:
                 prev.next = cur.next
                 cur.next = None
                 return cur
-                prev = cur
+            prev = cur
             cur = cur.next
         return None
 
@@ -107,11 +101,10 @@ class HashTable:
         index =  self.hash_index(key)
         cur = self.storage[index]
 
-
-
         while cur != None:
             if cur.key == key:
                 return cur.value
+            cur = cur.next
 
         return None
 
