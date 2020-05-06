@@ -2,7 +2,6 @@ class HashTableEntry:
     """
     Hash Table entry, as a linked list node.
     """
-
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -16,20 +15,39 @@ class HashTable:
 
     Implement this.
     """
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.storage = [None] * capacity
 
     def fnv1(self, key):
         """
         FNV-1 64-bit hash function
-
         Implement this, and/or DJB2.
         """
 
+        key_bytes = str(key).encode()
+        total = 0
+
+        for x in key_bytes:
+            total += x
+            total &= 0xffffffffffffffff
+        return total
+
     def djb2(self, key):
+
         """
         DJB2 32-bit hash function
 
         Implement this, and/or FNV-1.
         """
+
+        key_bytes = str(key).encode()
+        total = 0
+
+        for x in key_bytes:
+            total += x
+            total &= 0xffffffffffffffff
+        return total
 
     def hash_index(self, key):
         """
@@ -40,22 +58,39 @@ class HashTable:
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
-        """
-        Store the value with the given key.
 
-        Hash collisions should be handled with Linked List Chaining.
+        index =  self.hash_index(key)
+        new_val = HashTableEntry(key, value)
+        cur = self.storage[index]
 
-        Implement this.
-        """
+        if cur is not None:
+            self.storage[index] = new_val
+            self.storage[index].next = cur
+        else:
+            self.storage[index] = new_val
+
+        # return self.storage[index].value
 
     def delete(self, key):
-        """
-        Remove the value stored with the given key.
 
-        Print a warning if the key is not found.
+        index = self.hash_index(key)
+        prev = None
+        cur = self.storage[index]
 
-        Implement this.
-        """
+        #if there's nothing in that storage
+
+        if cur.key == key:
+            self.storage[index] = cur.next
+            return self.get(key)
+
+        while cur != None:
+            if cur.key == key:
+                prev.next = cur.next
+                self.storage[index].next = None
+                return self.get(key)
+            prev = cur
+            cur = cur.next
+        return self.get(key)
 
     def get(self, key):
         """
@@ -65,14 +100,24 @@ class HashTable:
 
         Implement this.
         """
+        index =  self.hash_index(key)
+        cur = self.storage[index]
+
+        while cur != None:
+            if cur.key == key:
+                return cur.value
+            cur = cur.next
+
+        return None
 
     def resize(self):
         """
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
-
         Implement this.
         """
+        self.storage = self.storage + [None] * self.capacity
+        return self.storage
 
 if __name__ == "__main__":
     ht = HashTable(2)
