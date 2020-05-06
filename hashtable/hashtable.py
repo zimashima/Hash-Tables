@@ -62,12 +62,14 @@ class HashTable:
         index =  self.hash_index(key)
         new_val = HashTableEntry(key, value)
         cur = self.storage[index]
+
         if cur is not None:
             self.storage[index] = new_val
             self.storage[index].next = cur
         else:
             self.storage[index] = new_val
-        return self.storage[index].value
+
+        # return self.storage[index].value
 
     def delete(self, key):
 
@@ -78,17 +80,17 @@ class HashTable:
         #if there's nothing in that storage
 
         if cur.key == key:
-            cur = cur.next
-            return cur
+            self.storage[index] = cur.next
+            return self.get(key)
 
         while cur != None:
             if cur.key == key:
                 prev.next = cur.next
-                cur.next = None
-                return cur
+                self.storage[index].next = None
+                return self.get(key)
             prev = cur
             cur = cur.next
-        return None
+        return self.get(key)
 
     def get(self, key):
         """
