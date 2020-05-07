@@ -16,6 +16,7 @@ class HashTable:
     Implement this.
     """
     def __init__(self, capacity):
+        self.entries = 0
         self.capacity = capacity
         self.storage = [None] * capacity
 
@@ -59,17 +60,16 @@ class HashTable:
 
     def put(self, key, value):
 
-        index =  self.hash_index(key)
-        new_val = HashTableEntry(key, value)
-        cur = self.storage[index]
-
-        if cur is not None:
-            self.storage[index] = new_val
-            self.storage[index].next = cur
+        index = self.hash_index(key)
+        if self.storage[index] is None:
+            self.storage[index] = HashTableEntry(key, value)
+            self.entries += 1
         else:
-            self.storage[index] = new_val
+            new_node = HashTableEntry(key, value)
+            new_node.next = self.storage[index]
+            self.storage[index] = new_node
+            self.entries += 1
 
-        # return self.storage[index].value
 
     def delete(self, key):
 
@@ -110,14 +110,17 @@ class HashTable:
 
         return None
 
-    def resize(self):
+    def resize(self, size):
         """
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
         Implement this.
         """
-        self.storage = self.storage + [None] * self.capacity
-        return self.storage
+        increase = size - self.capacity
+        add_array = [None] * increase
+        self.storage = self.storage + add_array
+        
+        return self.capacity
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -132,10 +135,10 @@ if __name__ == "__main__":
     print(ht.get("line_1"))
     print(ht.get("line_2"))
     print(ht.get("line_3"))
-
+    print(len(ht.storage))
     # Test resizing
     old_capacity = len(ht.storage)
-    ht.resize()
+    # ht.resize(20)
     new_capacity = len(ht.storage)
 
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
